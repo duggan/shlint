@@ -15,3 +15,7 @@ shlint_shells="list installed shells here separated by spaces"
 Use brew (http://mxcl.github.com/homebrew/) to install additional
 shells if you're missing any.
 
+## Install
+If you're a ruby user, can install using `gem install shlint`
+
+Any other nix platform, just drop the contents of `bin` into your `$PATH`
