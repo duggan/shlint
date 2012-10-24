@@ -21,4 +21,4 @@ shells if you're missing any.
 ## Install
 If you're a ruby user, can install using `gem install shlint`
 
-Any other nix platform, just drop the contents of `bin` into your `$PATH`
+Any other nix platform, just drop the contents of `lib` into your `$PATH`
