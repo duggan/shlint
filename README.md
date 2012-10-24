@@ -26,5 +26,5 @@ Any other nix platform, just drop the contents of `lib` into your `$PATH`
 ## Resources
 
 * [Portable Shell Programming](http://www.gnu.org/software/autoconf/manual/autoconf.html#Portable-Shell)
-* [How to make dash scripts work in dash](http://mywiki.wooledge.org/Bashism)
+* [How to make bash scripts work in dash](http://mywiki.wooledge.org/Bashism)
 * [POSIX shell specification](http://pubs.opengroup.org/onlinepubs/009695399/utilities/xcu_chap02.html)
