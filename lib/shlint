@@ -1,0 +1,72 @@
+#!/bin/sh
+
+# Prevent variables from being unset.
+# This helps avoid things like the debug parameter being repurposed.
+set -o nounset
+# Force the entire script to exit on error.
+# This prevents the script from ploughing on ahead through errors.
+set -o errexit
+
+# List of shells to test.
+# Add or remove from this list as required.
+shlint_shells="zsh ksh bash dash sh"
+
+shlint_debug=0
+shlint_commands=""
+
+if [ $# -eq 0 ]; then
+  cat <<-DOC
+shlint - shell linting utility.
+
+Usage: shlint [OPTIONS] <FILE...>
+
+  Drop me into your PATH for great justice!
+
+  Default shells tested are:
+  $shlint_shells
+  
+  Place a .shlintrc file in your homedir to override default shells.
+  This is expected to be shell syntax, specified as:
+  shlint_shells="list installed shells here separated by spaces"
+
+  OSX Users:
+  Use brew (http://mxcl.github.com/homebrew/) to install additional
+  shells if you're missing any.
+
+Options:
+  --debug   Prints additional output.
+DOC
+  exit 0
+fi
+
+for shlint_cmd in $@
+do
+  if [ "--debug" = "$shlint_cmd" ]; then
+    shlint_debug=1
+  else
+    shlint_commands="$shlint_commands $shlint_cmd"
+  fi
+done
+
+# Override default shell tests
+# Regular shell syntax here.
+if [ -f ~/.shlintrc ]; then
+  . ~/.shlintrc
+fi
+
+for shlint_shell in $shlint_shells
+do
+  if [ $shlint_debug = 1 ]; then
+    echo "Using $shlint_shell..."
+  fi
+  for shlint_cmd in $shlint_commands
+  do
+    if [ $shlint_debug = 1 ]; then
+      echo "Testing $shlint_cmd"
+      $shlint_shell -n $shlint_cmd
+    fi
+  done
+done
+
+# Check for bashisms
+checkbashisms $shlint_commands

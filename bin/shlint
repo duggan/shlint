@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+
+shell_output = ""
+IO.popen("lib/shlint #{ARGV.join(" ")}", 'r+') do |pipe|
+  pipe.close_write
+  shell_output = pipe.read
+end
+
+puts shell_output
