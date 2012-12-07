@@ -12,22 +12,27 @@ set -o errexit
 shlint_shells="zsh ksh bash dash sh"
 
 shlint_debug=0
-shlint_commands=""
+shlint_checkdir=0
+shlint_filelist=""
 
-if [ $# -eq 0 ]; then
-  cat <<-DOC
-shlint - shell linting utility.
+usage() {
+  echo \
+"shlint - shell linting utility.
 
 Usage: shlint [OPTIONS] <FILE...>
 
-  Drop me into your PATH for great justice!
+  if '.' (without quotes) is specified for FILE, directory is checked
+    recursively, ignoring hidden (dot prefixed) files and directories.
 
   Default shells tested are:
   $shlint_shells
   
   Place a .shlintrc file in your homedir to override default shells.
   This is expected to be shell syntax, specified as:
-  shlint_shells="list installed shells here separated by spaces"
+  shlint_shells=\"list installed shells here separated by spaces\"
+
+  You can also set debug mode on here permanently, with:
+  shlint_debug=1
 
   OSX Users:
   Use brew (http://mxcl.github.com/homebrew/) to install additional
@@ -35,23 +40,38 @@ Usage: shlint [OPTIONS] <FILE...>
 
 Options:
   --debug   Prints additional output.
-DOC
-  exit 0
+"
+}
+
+# Argument parsing
+if [ $# -eq 0 ] ; then
+  usage ; exit 0
 fi
 
-for shlint_cmd in $@
-do
-  if [ "--debug" = "$shlint_cmd" ]; then
-    shlint_debug=1
-  else
-    shlint_commands="$shlint_commands $shlint_cmd"
-  fi
+for cmd in $@ ; do
+  case "$cmd" in
+    "--debug"|"-d") shlint_debug=1 ; shift ;;
+    ".") shlint_checkdir=1 ; shift ;;
+    "--help"|"-h") usage ; exit 0 ; shift ;;
+  esac
 done
+
+if [ $shlint_checkdir -eq 1 ] ; then
+  shlint_filelist="$(grep -lr '#!/bin/sh' . | grep -v '^\.\/\.')"
+else
+  if [ $# -eq 0 ] ; then
+    echo "Nothing to check."
+    exit 0
+  fi
+  for param in $@ ; do
+    shlint_filelist="$shlint_filelist $param"
+  done
+fi
 
 # Override default shell tests
 # Regular shell syntax here.
 if [ -f ~/.shlintrc ]; then
-  . ~/.shlintrc
+  . ~/.shlintrc || exit 1
 fi
 
 for shlint_shell in $shlint_shells
@@ -59,14 +79,17 @@ do
   if [ $shlint_debug = 1 ]; then
     echo "Using $shlint_shell..."
   fi
-  for shlint_cmd in $shlint_commands
+  for shlint_file in $shlint_filelist
   do
     if [ $shlint_debug = 1 ]; then
-      echo "Testing $shlint_cmd"
-      $shlint_shell -n $shlint_cmd
+      echo "Testing $shlint_file"
+      $shlint_shell -n $shlint_file
     fi
   done
 done
 
+if [ $shlint_debug = 1 ] ; then
+  echo "Checking for bashisms..."
+fi
 # Check for bashisms
-checkbashisms $shlint_commands
+checkbashisms $shlint_filelist
