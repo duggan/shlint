@@ -33,7 +33,7 @@ Usage: $progname [-n] [-f] [-x] script ...
    or: $progname --help
    or: $progname --version
 This script performs basic checks for the presence of bashisms
-in /bin/sh scripts.
+in /bin/sh scripts and the lack of bashisms in /bin/bash ones.
 EOF
 
 my $version = <<"EOF";
@@ -74,6 +74,8 @@ if ($opt_version) { print $version; exit 0; }
 
 $opt_echo = 1 if $opt_posix;
 
+my $mode = 0;
+my $issues = 0;
 my $status = 0;
 my $makefile = 0;
 my (%bashisms, %string_bashisms, %singlequote_bashisms);
@@ -116,6 +118,8 @@ foreach my $filename (@ARGV) {
 	next;
     }
 
+    $issues = 0;
+    $mode = 0;
     my $cat_string = "";
     my $cat_indented = 0;
     my $quote_string = "";
@@ -143,9 +147,7 @@ foreach my $filename (@ARGV) {
 		next if $opt_force;
 
 		if ($interpreter =~ m,/bash$,) {
-		    warn "script $display_filename is already a bash script; skipping\n";
-		    $status |= 2;
-		    last;  # end this file
+		    $mode = 1;
 		}
 		elsif ($interpreter !~ m,/(sh|posh)$,) {
 ### ksh/zsh?
@@ -476,6 +478,11 @@ foreach my $filename (@ARGV) {
 	if ($buffered_line ne '');
 
     close C;
+
+    if ($mode && !$issues) {
+	warn "could not find any possible bashisms in bash script $filename\n";
+	$status |= 4;
+    }
 }
 
 exit $status;
@@ -483,8 +490,14 @@ exit $status;
 sub output_explanation {
     my ($filename, $line, $explanation) = @_;
 
-    warn "possible bashism in $filename line $. ($explanation):\n$line\n";
-    $status |= 1;
+    if ($mode) {
+        # When examining a bash script, just flag that there are indeed
+        # bashisms present
+        $issues = 1;
+    } else {
+        warn "possible bashism in $filename line $. ($explanation):\n$line\n";
+        $status |= 1;
+    }
 }
 
 # Returns non-zero if the given file is not actually a shell script,
