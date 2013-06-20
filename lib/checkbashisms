@@ -672,7 +672,7 @@ sub init_hashes {
 	qr'(?:^|\s+)TMOUT='           => q<TMOUT=>,
 	qr'\$\{?TIMEFORMAT\}?\b'      => q<$TIMEFORMAT>,
 	qr'(?:^|\s+)TIMEFORMAT='      => q<TIMEFORMAT=>,
-	qr'\$\{?_\}?\b'		      => q<$_>,
+	qr'(?<![$\\])\$\{?_\}?\b'     => q<$_>,
 	qr'(?:^|\s+)GLOBIGNORE='      => q<GLOBIGNORE=>,
 	qr'<<<'                       => q<\<\<\< here string>,
 	$LEADIN . qr'echo\s+(?:-[^e\s]+\s+)?\"[^\"]*(\\[abcEfnrtv0])+.*?[\"]' => q<unsafe echo with backslash>,
