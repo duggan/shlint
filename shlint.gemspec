@@ -11,6 +11,7 @@ Gem::Specification.new do |s|
   s.homepage    = "http://github.com/duggan/shlint"
   s.summary     = "A linting tool for shell."
   s.description = "Checks the syntax of your shellscript against known and available shells."
+  s.license     = 'MIT'
 
   s.required_rubygems_version = ">= 1.3.6"
 
