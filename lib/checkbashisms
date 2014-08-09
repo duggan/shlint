@@ -1,4 +1,4 @@
-#! /usr/bin/perl -w
+#!/usr/bin/perl -w
 
 # This script is essentially copied from /usr/share/lintian/checks/scripts,
 # which is:
@@ -82,6 +82,10 @@ my (%bashisms, %string_bashisms, %singlequote_bashisms);
 
 my $LEADIN = qr'(?:(?:^|[`&;(|{])\s*|(?:if|then|do|while|shell)\s+)';
 init_hashes;
+
+my @bashisms_keys = sort keys %bashisms;
+my @string_bashisms_keys = sort keys %string_bashisms;
+my @singlequote_bashisms_keys = sort keys %singlequote_bashisms;
 
 foreach my $filename (@ARGV) {
     my $check_lines_count = -1;
@@ -372,7 +376,8 @@ foreach my $filename (@ARGV) {
 	    $line =~ s/(^|[^\\\'\"])\"\'\"/$1/g;
 	    $line =~ s/(^|[^\\\'\"])\'\"\'/$1/g;
 
-	    while (my ($re,$expl) = each %singlequote_bashisms) {
+	    foreach my $re (@singlequote_bashisms_keys) {
+		my $expl = $singlequote_bashisms{$re};
 		if ($line =~ m/($re)/) {
 		    $found = 1;
 		    $match = $1;
@@ -417,7 +422,8 @@ foreach my $filename (@ARGV) {
 		}
 	    }
 
-	    while (my ($re,$expl) = each %string_bashisms) {
+	    foreach my $re (@string_bashisms_keys) {
+		my $expl = $string_bashisms{$re};
 		if ($line =~ m/($re)/) {
 		    $found = 1;
 		    $match = $1;
@@ -430,8 +436,9 @@ foreach my $filename (@ARGV) {
 	    # double-quoted strings, so now remove those strings as well.
 	    $line =~ s/(^|[^\\\'](?:\\\\)*)\"(?:\\.|[^\\\"])+\"/$1""/g;
 	    $cat_line =~ s/(^|[^<\\\'-](?:\\\\)*)\"(?:\\.|[^\\\"])+\"/$1""/g;
-	    while (my ($re,$expl) = each %bashisms) {
-	        if ($line =~ m/($re)/) {
+	    foreach my $re (@bashisms_keys) {
+		my $expl = $bashisms{$re};
+		if ($line =~ m/($re)/) {
 		    $found = 1;
 		    $match = $1;
 		    $explanation = $expl;
