@@ -91,5 +91,6 @@ done
 if [ $shlint_debug = 1 ] ; then
   echo "Checking for bashisms..."
 fi
-# Check for bashisms
-checkbashisms $shlint_filelist
+
+# Check for bashisms, pwd = GEM_ROOT
+./lib/checkbashisms $shlint_filelist
