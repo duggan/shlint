@@ -12,3 +12,5 @@ IO.popen("lib/shlint #{ARGV.join(" ")}", 'r+') do |pipe|
 end
 
 puts shell_output
+
+exit $?.exitstatus

@@ -94,3 +94,5 @@ fi
 
 # Check for bashisms, pwd = GEM_ROOT
 ./lib/checkbashisms $shlint_filelist
+
+exit $?
