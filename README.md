@@ -1,5 +1,7 @@
 #shlint - shell linting utility.
 
+[![No Maintenance Intended](http://unmaintained.tech/badge.svg)](http://unmaintained.tech/)
+
 Shlint uses locally available shells to test a shellscript for
 portability issues. It also runs `checkbashisms` against the code.
 
